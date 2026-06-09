@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="600.0"
+            prefWidth="800.0"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.template.MainController">
+
+   <children>
+
+      <Label layoutX="40" layoutY="30" text="Nome"/>
+
+      <TextField fx:id="txtNome"
+                 layoutX="100"
+                 layoutY="25"
+                 prefWidth="200"/>
+
+      <Label layoutX="40" layoutY="70" text="Nick"/>
+
+      <TextField fx:id="txtNick"
+                 layoutX="100"
+                 layoutY="65"
+                 prefWidth="200"/>
+
+      <Label layoutX="40" layoutY="110" text="Idade"/>
+
+      <TextField fx:id="txtIdade"
+                 layoutX="100"
+                 layoutY="105"
+                 prefWidth="200"/>
+
+      <Label layoutX="40" layoutY="150" text="Time"/>
+
+      <TextField fx:id="txtTime"
+                 layoutX="100"
+                 layoutY="145"
+                 prefWidth="200"/>
+
+      <Button text="Cadastrar:"
+              layoutX="350"
+              layoutY="25"
+              onAction="#cadastrar"/>
+      <Button text="Cadastrar"
+              layoutX="350"
+              layoutY="25"
+              onAction="#cadastrar"/>
+
+      <Button text="Editar"
+              layoutX="350"
+              layoutY="70"
+              onAction="#editar"/>
+
+      <Button text="Excluir"
+              layoutX="350"
+              layoutY="115"
+              onAction="#excluir"/>
+
+      <TableView fx:id="tabela"
+                 layoutX="40"
+                 layoutY="220"
+                 prefHeight="320"
+                 prefWidth="700">
+
+         <columns>
+
+            <TableColumn fx:id="colId"
+                         text="ID"
+                         prefWidth="60"/>
+
+            <TableColumn fx:id="colNome"
+                         text="Nome"
+                         prefWidth="180"/>
+
+            <TableColumn fx:id="colNick"
+                         text="Nick"
+                         prefWidth="150"/>
+
+            <TableColumn fx:id="colIdade"
+                         text="Idade"
+                         prefWidth="80"/>
+
+            <TableColumn fx:id="colTime"
+                         text="Time"
+                         prefWidth="200"/>
+
+         </columns>
+
+      </TableView>
+
+   </children>
+
+</AnchorPane>
