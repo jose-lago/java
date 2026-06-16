@@ -9,7 +9,10 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 
 import javafx.scene.control.cell.PropertyValueFactory;
 
@@ -48,6 +51,9 @@ public class MainController implements Initializable {
     @FXML
     private TableColumn<PlayerDTO, String> colTime;
 
+    @FXML
+    private Button btnEditar;
+
     private PlayerDTO playerSelecionado;
 
     @Override
@@ -68,19 +74,34 @@ public class MainController implements Initializable {
         colTime.setCellValueFactory(
                 new PropertyValueFactory<>("timequejoga"));
 
+        // Botão Editar só fica habilitado
+        // quando houver uma linha selecionada.
+        btnEditar.disableProperty().bind(
+                tabela.getSelectionModel()
+                        .selectedItemProperty()
+                        .isNull()
+        );
+
         tabela.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((obs, antigo, novo) -> {
 
+                    playerSelecionado = novo;
+
                     if (novo != null) {
 
-                        playerSelecionado = novo;
-
                         txtNome.setText(novo.getNome());
-                        txtNick.setText(novo.getNick());
-                        txtIdade.setText(
-                                String.valueOf(novo.getIdade())
+
+                        txtNick.setText(
+                                novo.getNick()
                         );
+
+                        txtIdade.setText(
+                                String.valueOf(
+                                        novo.getIdade()
+                                )
+                        );
+
                         txtTime.setText(
                                 novo.getTimequejoga()
                         );
@@ -164,5 +185,7 @@ public class MainController implements Initializable {
         txtTime.clear();
 
         playerSelecionado = null;
+
+        tabela.getSelectionModel().clearSelection();
     }
 }
