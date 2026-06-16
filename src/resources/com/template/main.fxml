@@ -43,10 +43,12 @@
               layoutX="350"
               layoutY="25"
               onAction="#cadastrar"/>
-      <Button text="Cadastrar"
+      <Button fx:id="btnEditar"
+              text="Editar"
               layoutX="350"
-              layoutY="25"
-              onAction="#cadastrar"/>
+              layoutY="70"
+              disable="true"
+              onAction="#editar"/>
 
       <Button text="Editar"
               layoutX="350"
