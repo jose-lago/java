@@ -171,6 +171,7 @@ public class MainController implements Initializable {
     }
 
     private boolean validarCampos() {
+        // 1. Verifica se os campos estão vazios
         if (txtNome.getText().trim().isEmpty() ||
                 txtNick.getText().trim().isEmpty() ||
                 txtIdade.getText().trim().isEmpty() ||
@@ -180,6 +181,14 @@ public class MainController implements Initializable {
             return false;
         }
 
+        // 2. Validação do Nome usando o NomeValidador
+        NomeValidador nomeValidador = new NomeValidador(txtNome.getText().trim());
+        if (!nomeValidador.validar(txtNome.getText().trim())) {
+            DialogUtil.mostrarAlerta("Validação", nomeValidador.getMensagemErro());
+            return false;
+        }
+
+        // 3. Validação do campo Idade
         try {
             int idade = Integer.parseInt(txtIdade.getText().trim());
             if (idade <= 0) {
