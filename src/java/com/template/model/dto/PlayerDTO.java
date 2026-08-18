@@ -1,4 +1,4 @@
-package com.template.model;
+package com.template.model.dto;
 
 public class PlayerDTO {
 
@@ -13,6 +13,13 @@ public class PlayerDTO {
 
     public PlayerDTO(int id, String nome, String nick, int idade, String timequejoga) {
         this.id = id;
+        this.nome = nome;
+        this.nick = nick;
+        this.idade = idade;
+        this.timequejoga = timequejoga;
+    }
+
+    public PlayerDTO(String nome, String nick, int idade, String timequejoga) {
         this.nome = nome;
         this.nick = nick;
         this.idade = idade;
