@@ -1,92 +1,114 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.AnchorPane?>
+        <?import javafx.scene.control.Button?>
+        <?import javafx.scene.control.Label?>
+        <?import javafx.scene.control.TableColumn?>
+        <?import javafx.scene.control.TableView?>
+        <?import javafx.scene.control.TextField?>
+        <?import javafx.scene.layout.AnchorPane?>
 
 <AnchorPane prefHeight="600.0"
             prefWidth="800.0"
             xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.template.controller.MainController">
+            xmlns:fx="http://javafx.com/fxml/1">
 
    <children>
 
-      <Label layoutX="40" layoutY="30" text="Nome"/>
+      <Label layoutX="40.0"
+             layoutY="30.0"
+             text="Nome"/>
 
       <TextField fx:id="txtNome"
-                 layoutX="100"
-                 layoutY="25"
-                 prefWidth="200"/>
+                 layoutX="100.0"
+                 layoutY="25.0"
+                 prefWidth="200.0"/>
 
-      <Label layoutX="40" layoutY="70" text="Nick"/>
+
+      <Label layoutX="40.0"
+             layoutY="70.0"
+             text="Nick"/>
 
       <TextField fx:id="txtNick"
-                 layoutX="100"
-                 layoutY="65"
-                 prefWidth="200"/>
+                 layoutX="100.0"
+                 layoutY="65.0"
+                 prefWidth="200.0"/>
 
-      <Label layoutX="40" layoutY="110" text="Idade"/>
+
+      <Label layoutX="40.0"
+             layoutY="110.0"
+             text="Idade"/>
 
       <TextField fx:id="txtIdade"
-                 layoutX="100"
-                 layoutY="105"
-                 prefWidth="200"/>
+                 layoutX="100.0"
+                 layoutY="105.0"
+                 prefWidth="200.0"/>
 
-      <Label layoutX="40" layoutY="150" text="Time"/>
+
+      <Label layoutX="40.0"
+             layoutY="150.0"
+             text="Time"/>
 
       <TextField fx:id="txtTime"
-                 layoutX="100"
-                 layoutY="145"
-                 prefWidth="200"/>
+                 layoutX="100.0"
+                 layoutY="145.0"
+                 prefWidth="200.0"/>
 
-      <Button text="Cadastrar:"
-              layoutX="350"
-              layoutY="25"
+
+      <Button text="Cadastrar"
+              layoutX="350.0"
+              layoutY="25.0"
               onAction="#cadastrar"/>
+
+
       <Button fx:id="btnEditar"
               text="Editar"
-              layoutX="350"
-              layoutY="70"
+              layoutX="350.0"
+              layoutY="70.0"
               disable="true"
               onAction="#editar"/>
 
-      <Button text="Editar"
-              layoutX="350"
-              layoutY="70"
-              onAction="#editar"/>
 
-      <Button text="Excluir"
-              layoutX="350"
-              layoutY="115"
+      <Button fx:id="btnExcluir"
+              text="Excluir"
+              layoutX="350.0"
+              layoutY="115.0"
+              disable="true"
               onAction="#excluir"/>
 
+
+      <Button text="Limpar"
+              layoutX="430.0"
+              layoutY="25.0"
+              onAction="#limparCampos"/>
+
+
       <TableView fx:id="tabela"
-                 layoutX="40"
-                 layoutY="220"
-                 prefHeight="320"
-                 prefWidth="700">
+                 layoutX="40.0"
+                 layoutY="220.0"
+                 prefHeight="320.0"
+                 prefWidth="700.0">
 
          <columns>
 
             <TableColumn fx:id="colId"
                          text="ID"
-                         prefWidth="60"/>
+                         prefWidth="60.0"/>
 
             <TableColumn fx:id="colNome"
                          text="Nome"
-                         prefWidth="180"/>
+                         prefWidth="180.0"/>
 
             <TableColumn fx:id="colNick"
                          text="Nick"
-                         prefWidth="150"/>
+                         prefWidth="150.0"/>
 
             <TableColumn fx:id="colIdade"
                          text="Idade"
-                         prefWidth="80"/>
+                         prefWidth="80.0"/>
 
             <TableColumn fx:id="colTime"
                          text="Time"
-                         prefWidth="200"/>
+                         prefWidth="200.0"/>
 
          </columns>
 

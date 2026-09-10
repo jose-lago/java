@@ -3,6 +3,7 @@ package com.template.controller;
 import com.template.model.dao.PlayerDAO;
 import com.template.model.dto.PlayerDTO;
 import com.template.util.DialogUtil;
+import com.template.validator.IPlayerValidador;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -56,147 +57,275 @@ public class MainController implements Initializable {
     private Button btnExcluir;
 
     private PlayerDTO playerSelecionado;
-    private final PlayerDAO dao = new PlayerDAO();
+
+    // DAO continua responsável pelo acesso ao banco
+    private final PlayerDAO dao;
+
+    // O Controller depende da INTERFACE
+    private final IPlayerValidador playerValidador;
+
+    /*
+     * O validador é recebido por injeção de dependência.
+     *
+     * O Controller não cria um PlayerValidador diretamente.
+     */
+    public MainController(IPlayerValidador playerValidador) {
+
+        this.playerValidador = playerValidador;
+        this.dao = new PlayerDAO();
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
-        colNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
-        colNick.setCellValueFactory(new PropertyValueFactory<>("nick"));
-        colIdade.setCellValueFactory(new PropertyValueFactory<>("idade"));
-        colTime.setCellValueFactory(new PropertyValueFactory<>("timequejoga"));
 
-        // Habilita/Desabilita botões conforme seleção na tabela
+        // Configuração das colunas da tabela
+        colId.setCellValueFactory(
+                new PropertyValueFactory<>("id")
+        );
+
+        colNome.setCellValueFactory(
+                new PropertyValueFactory<>("nome")
+        );
+
+        colNick.setCellValueFactory(
+                new PropertyValueFactory<>("nick")
+        );
+
+        colIdade.setCellValueFactory(
+                new PropertyValueFactory<>("idade")
+        );
+
+        colTime.setCellValueFactory(
+                new PropertyValueFactory<>("timequejoga")
+        );
+
+        // Habilita/Desabilita os botões conforme a seleção
         if (btnEditar != null) {
-            btnEditar.disableProperty().bind(tabela.getSelectionModel().selectedItemProperty().isNull());
+
+            btnEditar.disableProperty().bind(
+                    tabela.getSelectionModel()
+                            .selectedItemProperty()
+                            .isNull()
+            );
         }
+
         if (btnExcluir != null) {
-            btnExcluir.disableProperty().bind(tabela.getSelectionModel().selectedItemProperty().isNull());
+
+            btnExcluir.disableProperty().bind(
+                    tabela.getSelectionModel()
+                            .selectedItemProperty()
+                            .isNull()
+            );
         }
 
-        tabela.getSelectionModel().selectedItemProperty().addListener((obs, antigo, novo) -> {
-            playerSelecionado = novo;
+        // Detecta quando um player é selecionado na tabela
+        tabela.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((obs, antigo, novo) -> {
 
-            if (novo != null) {
-                txtNome.setText(novo.getNome());
-                txtNick.setText(novo.getNick());
-                txtIdade.setText(String.valueOf(novo.getIdade()));
-                txtTime.setText(novo.getTimequejoga());
-            }
-        });
+                    playerSelecionado = novo;
 
+                    if (novo != null) {
+
+                        txtNome.setText(novo.getNome());
+                        txtNick.setText(novo.getNick());
+                        txtIdade.setText(
+                                String.valueOf(novo.getIdade())
+                        );
+                        txtTime.setText(
+                                novo.getTimequejoga()
+                        );
+                    }
+                });
+
+        // Carrega os dados do banco
         carregarTabela();
     }
-
     public void carregarTabela() {
-        ObservableList<PlayerDTO> lista = FXCollections.observableArrayList(dao.listarPlayers());
+
+        ObservableList<PlayerDTO> lista =
+                FXCollections.observableArrayList(
+                        dao.listarPlayers()
+                );
+
         tabela.setItems(lista);
     }
-
     @FXML
     public void cadastrar() {
-        if (!validarCampos()) return;
 
-        PlayerDTO player = new PlayerDTO(
-                txtNome.getText().trim(),
-                txtNick.getText().trim(),
-                Integer.parseInt(txtIdade.getText().trim()),
-                txtTime.getText().trim()
-        );
+        PlayerDTO player = criarPlayerDosCampos();
+
+        // Validação feita através da interface
+        if (!validarPlayer(player)) {
+            return;
+        }
 
         if (dao.cadastrarPlayer(player)) {
-            DialogUtil.mostrarInformacao("Sucesso", "Player cadastrado com sucesso!");
+
+            DialogUtil.mostrarInformacao(
+                    "Sucesso",
+                    "Player cadastrado com sucesso!"
+            );
+
             limparCampos();
             carregarTabela();
+
         } else {
-            DialogUtil.mostrarErro("Erro", "Não foi possível cadastrar o player.");
+
+            DialogUtil.mostrarErro(
+                    "Erro",
+                    "Não foi possível cadastrar o player."
+            );
         }
     }
-
     @FXML
     public void editar() {
+
         if (playerSelecionado == null) {
-            DialogUtil.mostrarAlerta("Atenção", "Selecione um player para editar.");
+
+            DialogUtil.mostrarAlerta(
+                    "Atenção",
+                    "Selecione um player para editar."
+            );
+
             return;
         }
 
-        if (!validarCampos()) return;
+        PlayerDTO playerAtualizado =
+                criarPlayerDosCampos();
 
-        playerSelecionado.setNome(txtNome.getText().trim());
-        playerSelecionado.setNick(txtNick.getText().trim());
-        playerSelecionado.setIdade(Integer.parseInt(txtIdade.getText().trim()));
-        playerSelecionado.setTimequejoga(txtTime.getText().trim());
-
-        if (dao.editarPlayer(playerSelecionado)) {
-            DialogUtil.mostrarInformacao("Sucesso", "Player atualizado com sucesso!");
-            limparCampos();
-            carregarTabela();
-        } else {
-            DialogUtil.mostrarErro("Erro", "Não foi possível atualizar o player.");
-        }
-    }
-
-    @FXML
-    public void excluir() {
-        if (playerSelecionado == null) {
-            DialogUtil.mostrarAlerta("Atenção", "Selecione um player para excluir.");
-            return;
-        }
-
-        boolean confirm = DialogUtil.confirmarAcao(
-                "Confirmar Exclusão",
-                "Tem certeza que deseja excluir o player " + playerSelecionado.getNick() + "?"
+        // Mantém o ID original
+        playerAtualizado.setId(
+                playerSelecionado.getId()
         );
 
+        // Validação feita através da interface
+        if (!validarPlayer(playerAtualizado)) {
+            return;
+        }
+
+        // Atualiza os dados do player selecionado
+        playerSelecionado.setNome(
+                playerAtualizado.getNome()
+        );
+
+        playerSelecionado.setNick(
+                playerAtualizado.getNick()
+        );
+
+        playerSelecionado.setIdade(
+                playerAtualizado.getIdade()
+        );
+
+        playerSelecionado.setTimequejoga(
+                playerAtualizado.getTimequejoga()
+        );
+
+        if (dao.editarPlayer(playerSelecionado)) {
+
+            DialogUtil.mostrarInformacao(
+                    "Sucesso",
+                    "Player atualizado com sucesso!"
+            );
+
+            limparCampos();
+            carregarTabela();
+
+        } else {
+
+            DialogUtil.mostrarErro(
+                    "Erro",
+                    "Não foi possível atualizar o player."
+            );
+        }
+    }
+    @FXML
+    public void excluir() {
+
+        if (playerSelecionado == null) {
+
+            DialogUtil.mostrarAlerta(
+                    "Atenção",
+                    "Selecione um player para excluir."
+            );
+
+            return;
+        }
+
+        boolean confirm =
+                DialogUtil.confirmarAcao(
+                        "Confirmar Exclusão",
+                        "Tem certeza que deseja excluir o player "
+                                + playerSelecionado.getNick()
+                                + "?"
+                );
+
         if (confirm) {
-            if (dao.deletarPlayer(playerSelecionado.getId())) {
-                DialogUtil.mostrarInformacao("Sucesso", "Player excluído com sucesso!");
+
+            if (dao.deletarPlayer(
+                    playerSelecionado.getId()
+            )) {
+
+                DialogUtil.mostrarInformacao(
+                        "Sucesso",
+                        "Player excluído com sucesso!"
+                );
+
                 limparCampos();
                 carregarTabela();
+
             } else {
-                DialogUtil.mostrarErro("Erro", "Não foi possível excluir o player.");
+
+                DialogUtil.mostrarErro(
+                        "Erro",
+                        "Não foi possível excluir o player."
+                );
             }
         }
     }
-
     @FXML
     public void limparCampos() {
+
         txtNome.clear();
         txtNick.clear();
         txtIdade.clear();
         txtTime.clear();
 
         playerSelecionado = null;
-        tabela.getSelectionModel().clearSelection();
+
+        tabela.getSelectionModel()
+                .clearSelection();
     }
 
-    private boolean validarCampos() {
-        // 1. Verifica se os campos estão vazios
-        if (txtNome.getText().trim().isEmpty() ||
-                txtNick.getText().trim().isEmpty() ||
-                txtIdade.getText().trim().isEmpty() ||
-                txtTime.getText().trim().isEmpty()) {
+    private PlayerDTO criarPlayerDosCampos() {
 
-            DialogUtil.mostrarAlerta("Validação", "Preencha todos os campos do formulário.");
-            return false;
-        }
+        int idade = 0;
 
-        // 2. Validação do Nome usando o NomeValidador
-        NomeValidador nomeValidador = new NomeValidador(txtNome.getText().trim());
-        if (!nomeValidador.validar(txtNome.getText().trim())) {
-            DialogUtil.mostrarAlerta("Validação", nomeValidador.getMensagemErro());
-            return false;
-        }
-
-        // 3. Validação do campo Idade
         try {
-            int idade = Integer.parseInt(txtIdade.getText().trim());
-            if (idade <= 0) {
-                DialogUtil.mostrarAlerta("Validação", "A idade deve ser um número inteiro maior que zero.");
-                return false;
-            }
+
+            idade = Integer.parseInt(
+                    txtIdade.getText().trim()
+            );
+
         } catch (NumberFormatException e) {
-            DialogUtil.mostrarAlerta("Validação", "O campo 'Idade' deve conter apenas números.");
+        }
+
+        return new PlayerDTO(
+                txtNome.getText().trim(),
+                txtNick.getText().trim(),
+                idade,
+                txtTime.getText().trim()
+        );
+    }
+    private boolean validarPlayer(PlayerDTO player) {
+
+        if (!playerValidador.validar(player)) {
+
+            DialogUtil.mostrarAlerta(
+                    "Validação",
+                    playerValidador.getMensagemErro()
+            );
+
             return false;
         }
 
